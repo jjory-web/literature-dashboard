@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>문학 시리즈 이름 공모 | 팀 대시보드</title>
+  <style>
+    :root{font-family:Pretendard,"Noto Sans KR",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#262337;background:#f8f7fc;font-synthesis:none}
+    *{box-sizing:border-box}body{margin:0}button,input{font:inherit}button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.45}
+    .shell{max-width:1250px;margin:auto;padding:38px 26px 70px}.top{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:29px}.eyebrow{font-size:12px;font-weight:700;color:#7c63b4;letter-spacing:1.2px}.top h1{margin:7px 0 5px;font-size:29px;letter-spacing:-1.3px}.sub{color:#777486;font-size:14px;margin:0}.logout{background:white;border:1px solid #dedbe6;padding:10px 15px;border-radius:12px;color:#5f5a6f}
+    .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;margin:18px 0}.tile,.panel,.auth-card{background:white;border:1px solid #ebe8f1;border-radius:18px;box-shadow:0 8px 28px #372c5710}.tile{padding:23px 24px}.tile-label{color:#6c687b;font-size:13px}.tile-number{margin-top:7px;font-size:31px;letter-spacing:-1px;font-weight:800}.tile small{font-size:12px;color:#888396}
+    .panel{padding:24px;margin-top:18px}.toolbar,.tablehead{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:13px}.toolbar h2{font-size:18px;margin:0 0 5px}.toolbar p{font-size:13px;color:#777486;margin:0}.controls{display:flex;gap:9px;flex-wrap:wrap;margin-top:20px}.search{min-width:230px;flex:1;max-width:410px}.search input,.auth-card input{width:100%;border:1px solid #dcd9e7;background:#fff;padding:12px 13px;border-radius:11px;outline-color:#8366c4}select{border:1px solid #dcd9e7;border-radius:11px;padding:10px;background:white;color:#4b455f}.primary{border:0;background:#7961b1;color:white;font-weight:700;border-radius:11px;padding:12px 17px}.secondary{border:1px solid #dad4e9;background:#f7f4ff;color:#7057a7;font-weight:700;border-radius:11px;padding:11px 14px}.muted{color:#787386;font-size:12px}.status{font-size:12px;color:#746e81;display:flex;align-items:center;gap:7px;margin-top:17px}.dot{width:8px;height:8px;border-radius:50%;background:#bcb6c9;display:inline-block}.dot.on{background:#43a57a}
+    .scroll{overflow-x:auto;margin-top:16px}table{border-collapse:collapse;width:100%;min-width:950px;text-align:left}th{background:#f7f5fb;color:#716b7f;font-size:12px;white-space:nowrap;font-weight:700}td,th{padding:13px 13px;border-bottom:1px solid #eeeaf4;vertical-align:top}td{font-size:13px;line-height:1.55}td:nth-child(1){width:58px;color:#888}td:nth-child(2){width:92px;font-weight:700}td:nth-child(3){width:172px}td:nth-child(4){width:190px;font-weight:700}td:nth-child(5){max-width:420px}td:nth-child(6){width:150px;color:#797382;white-space:nowrap}.ellipsis{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word}.reason{border:0;padding:0;background:none;color:#625b71;text-align:left;line-height:1.6;max-width:100%}.reason:hover{text-decoration:underline}.empty{text-align:center;padding:45px 8px;color:#8c849b}.pager{display:flex;align-items:center;justify-content:space-between;gap:9px;margin-top:17px}.pager button{border:1px solid #ddd7e8;background:white;border-radius:9px;padding:8px 12px;color:#605872}.footer{margin-top:18px;color:#8b8694;font-size:12px}.hidden{display:none!important}
+    .auth-wrap{min-height:90vh;display:grid;place-items:center;padding:20px}.auth-card{padding:35px;width:min(100%,440px)}.auth-card h1{font-size:25px;margin:8px 0}.auth-card p{font-size:14px;color:#736d81;line-height:1.7}.auth-card label{display:block;font-size:13px;font-weight:700;margin:23px 0 8px}.auth-card button{width:100%;margin-top:13px}.message{font-size:13px;margin-top:13px;color:#7263a1;line-height:1.6}.error{color:#ae4358}.setup{background:#fff8e9;border:1px solid #eadab6;border-radius:10px;padding:12px;font-size:13px;line-height:1.7;color:#8c672a}.back{background:none;border:none;color:#7961b1;padding:0;margin-top:18px}
+    dialog{border:0;border-radius:18px;padding:0;max-width:620px;width:calc(100% - 30px);box-shadow:0 20px 60px #2224}dialog::backdrop{background:#2228}.dialog-body{padding:27px}.dialog-body h3{margin:0 0 10px}.dialog-body p{line-height:1.8;white-space:pre-wrap;overflow-wrap:anywhere}.dialog-body .meta{color:#797281;font-size:13px}.dialog-actions{text-align:right}
+    @media(max-width:690px){.shell{padding:24px 14px}.top h1{font-size:23px}.grid{gap:8px}.tile{padding:15px 12px}.tile-number{font-size:24px}.tile-label{font-size:11px}.panel{padding:17px 13px}.top{align-items:center}.logout{padding:9px;font-size:12px}}
+  </style>
+</head>
+<body>
+  <div id="authView" class="auth-wrap"><section class="auth-card">
+    <div class="eyebrow">MIRAE-N · TEAM DASHBOARD</div><h1>문학 시리즈 이름 공모</h1><p>팀원 공유용 응모 현황입니다.<br><strong>@mirae-n.com</strong> 회사 이메일 인증 후 조회할 수 있습니다.</p>
+    <div id="setupNotice" class="setup hidden">연결 설정이 아직 비어 있어요. HTML 상단의 SUPABASE_URL과 SUPABASE_PUBLISHABLE_KEY를 입력한 뒤 배포해 주세요. 자세한 방법은 함께 제공된 안내문을 확인해 주세요.</div>
+    <div id="emailBox"><label for="email">회사 이메일</label><input type="email" id="email" placeholder="name@mirae-n.com" autocomplete="email"><button id="sendBtn" class="primary">인증 메일 받기</button></div>
+    <div id="otpBox" class="hidden"><p>인증 메일의 링크를 클릭하거나 6자리 코드가 있다면 입력해 주세요.</p><label for="otp">이메일로 받은 6자리 인증 코드</label><input id="otp" type="text" inputmode="numeric" maxlength="6" placeholder="000000" autocomplete="one-time-code"><button id="verifyBtn" class="primary">인증하고 대시보드 보기</button><button id="backBtn" class="back">이메일 다시 입력하기</button></div>
+    <div id="authMessage" class="message" role="status"></div>
+  </section></div>
+  <main id="dashboard" class="shell hidden">
+    <header class="top"><div><div class="eyebrow">MIRAE-N · LITERATURE PROJECT</div><h1>교과서 문학 시리즈 이름 공모</h1><p class="sub">회사 이메일 인증 후 조회 · 30초마다 자동 갱신 · 조회 전용</p></div><button id="logoutBtn" class="logout">로그아웃</button></header>
+    <div class="grid"><article class="tile"><div class="tile-label">전체 응모 건수</div><div id="totalCount" class="tile-number">—</div><small>중복 응모 포함</small></article><article class="tile"><div class="tile-label">응모자 수</div><div id="personCount" class="tile-number">—</div><small>이름·소속 조합 기준</small></article><article class="tile"><div class="tile-label">오늘 접수</div><div id="todayCount" class="tile-number">—</div><small>한국 시간 기준</small></article></div>
+    <section class="panel"><div class="toolbar"><div><h2>전체 응모 목록</h2><p>같은 사람이 여러 번 제출해도 각각 표시합니다.</p></div><button id="exportBtn" class="secondary">↓ CSV 다운로드</button></div>
+      <div class="controls"><div class="search"><input id="searchInput" aria-label="응모 내역 검색" placeholder="응모자 · 소속 · 제안명 · 제안 이유 검색"></div><select id="sortSelect" aria-label="정렬"><option value="new">최신 응모순</option><option value="old">오래된 응모순</option><option value="name">응모자 이름순</option></select><button id="refreshBtn" class="secondary">↻ 새로고침</button></div>
+      <div class="status"><span id="liveDot" class="dot"></span><span id="statusText" role="status">데이터를 불러오는 중입니다.</span></div>
+      <div class="scroll"><table><thead><tr><th>No.</th><th>응모자</th><th>소속 팀</th><th>제안한 시리즈명</th><th>제안 이유 (클릭하면 전문 보기)</th><th>접수 시각</th></tr></thead><tbody id="rows"></tbody></table></div>
+      <div class="pager"><span id="pageInfo" class="muted"></span><div><button id="prevBtn">이전</button> <button id="nextBtn">다음</button></div></div>
+    </section><p class="footer">원본 응모 데이터는 변경되지 않습니다. 다운로드 파일에는 현재 검색 결과의 모든 행이 포함됩니다.</p>
+  </main>
+  <dialog id="reasonDialog"><div class="dialog-body"><h3 id="dialogTitle"></h3><div id="dialogMeta" class="meta"></div><p id="dialogReason"></p><div class="dialog-actions"><button id="closeDialog" class="secondary">닫기</button></div></div></dialog>
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+    // 아래 두 값만 본인 Supabase 프로젝트에서 복사해서 입력하세요.
+    // SERVICE_ROLE/SECRET 키는 절대로 이 파일에 넣지 마세요.
+    const SUPABASE_URL = 'https://rtkzwcjrudwzbwoxqyrv.supabase.co';
+    const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_vsCjVKXhwS3G8_gW5onWig_tie07cat';
+    const COMPANY_DOMAIN = '@mirae-n.com';
+    const PAGE_SIZE = 20;
+    const DASHBOARD_URL = 'https://jjory-web.github.io/literature-dashboard/';
+    const $ = id => document.getElementById(id);
+    const configured = SUPABASE_URL.startsWith('https://') && !SUPABASE_URL.includes('PASTE_') && !SUPABASE_PUBLISHABLE_KEY.includes('PASTE_');
+    const db = configured ? createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY) : null;
+    let allRows=[], filtered=[], page=0, channel=null, poller=null, refreshPromise=null, lastEmail='';
+    function allowed(email){return typeof email==='string' && email.toLowerCase().trim().endsWith(COMPANY_DOMAIN) && email.toLowerCase().trim().split('@').length===2 && email.split('@')[0].length>0;}
+    function message(msg, isError=false){$('authMessage').textContent=msg;$('authMessage').className='message'+(isError?' error':'');}
+    function toLocal(value){if(!value)return '—';const d=new Date(value);return Number.isNaN(d.getTime())?'—':new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false}).format(d);}
+    function dayKST(value){const d=new Date(value);return Number.isNaN(d.getTime())?'':new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).format(d);}
+    function cmpTime(a,b){return new Date(a.created_at||0)-new Date(b.created_at||0);}
+    function showAuth(){ $('authView').classList.remove('hidden');$('dashboard').classList.add('hidden');stopWatching(); }
+    function showDashboard(){ $('authView').classList.add('hidden');$('dashboard').classList.remove('hidden');startWatching(); }
+    function setStatus(label, live=false){$('statusText').textContent=label;$('liveDot').classList.toggle('on',live);}
+    async function fetchAll(){const chunk=500, result=[];let offset=0;
+      while(true){const {data,error}=await db.rpc('dashboard_naming_entries').order('id',{ascending:true}).range(offset,offset+chunk-1);
+        if(error)throw error;result.push(...(data||[]));if(!data||data.length<chunk)break;offset+=chunk;if(offset>=100000)throw new Error('응모 데이터가 10만 건을 넘어 관리자 확인이 필요합니다.');}
+      return result;
+    }
+    async function refresh(){if(refreshPromise)return refreshPromise;refreshPromise=(async()=>{try{setStatus('최신 응모 내역을 불러오는 중…');const data=await fetchAll();allRows=data;rebuild();setStatus(`마지막 갱신: ${new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).format(new Date())} · 자동 갱신 중`,true);}catch(e){allRows=[];filtered=[];page=0;rebuild();setStatus('조회 실패: '+e.message);console.error(e);}})();try{await refreshPromise;}finally{refreshPromise=null;}}
+    function rebuild(){const needle=$('searchInput').value.trim().toLocaleLowerCase('ko');filtered=allRows.filter(r=>[r.name,r.department,r.naming,r.reason].some(v=>String(v??'').toLocaleLowerCase('ko').includes(needle)));
+      const sort=$('sortSelect').value;filtered.sort(sort==='old'?(a,b)=>cmpTime(a,b)||Number(a.id)-Number(b.id):sort==='name'?(a,b)=>String(a.name||'').localeCompare(String(b.name||''),'ko')||cmpTime(b,a):(a,b)=>cmpTime(b,a)||Number(b.id)-Number(a.id));
+      const today=dayKST(new Date());$('totalCount').textContent=allRows.length.toLocaleString('ko-KR')+'건';$('personCount').textContent=new Set(allRows.map(r=>JSON.stringify([r.name||'',r.department||'']))).size.toLocaleString('ko-KR')+'명';$('todayCount').textContent=allRows.filter(r=>dayKST(r.created_at)===today).length.toLocaleString('ko-KR')+'건';
+      const max=Math.max(0,Math.ceil(filtered.length/PAGE_SIZE)-1);page=Math.min(page,max);draw();}
+    function cell(tr,value,cls){const td=document.createElement('td');td.textContent=String(value??'—');if(cls)td.className=cls;tr.appendChild(td);return td;}
+    function draw(){const body=$('rows');body.replaceChildren();const rows=filtered.slice(page*PAGE_SIZE,(page+1)*PAGE_SIZE);
+      if(!rows.length){const tr=document.createElement('tr');const td=document.createElement('td');td.colSpan=6;td.className='empty';td.textContent='표시할 응모 내역이 없습니다.';tr.append(td);body.append(tr);}
+      for(const r of rows){const tr=document.createElement('tr');cell(tr,r.id);cell(tr,r.name);cell(tr,r.department);cell(tr,r.naming);
+        const td=document.createElement('td');const btn=document.createElement('button');btn.className='reason ellipsis';btn.textContent=r.reason||'—';btn.title='제안 이유 전체 보기';btn.addEventListener('click',()=>{$('dialogTitle').textContent=r.naming||'제안 이유';$('dialogMeta').textContent=`${r.name||'—'} · ${r.department||'—'} · ${toLocal(r.created_at)}`;$('dialogReason').textContent=r.reason||'제안 이유 없음';$('reasonDialog').showModal();});td.append(btn);tr.append(td);cell(tr,toLocal(r.created_at));body.append(tr);}
+      $('pageInfo').textContent=`검색 결과 ${filtered.length.toLocaleString('ko-KR')}건 · ${filtered.length?page+1:0} / ${Math.ceil(filtered.length/PAGE_SIZE)}페이지`;$('prevBtn').disabled=page===0;$('nextBtn').disabled=(page+1)*PAGE_SIZE>=filtered.length;}
+    function stopWatching(){if(channel){db?.removeChannel(channel);channel=null;}if(poller){clearInterval(poller);poller=null;}}
+    function startWatching(){stopWatching();refresh();/* 테이블 API 비노출 상태이므로 Realtime 구독 대신 30초 주기 조회 */poller=setInterval(()=>{if(!document.hidden)refresh();},30000);}
+    function csvSafe(v){let str=String(v??'');if(/^[\s]*[=+\-@\t\r]/.test(str))str="'"+str;return '"'+str.replaceAll('"','""')+'"';}
+    function exportCsv(){const headers=['응모 번호','응모자 이름','소속 팀','제안한 시리즈명','제안 이유','접수 시각(한국 시간)'];const lines=[headers,...filtered.map(r=>[r.id,r.name,r.department,r.naming,r.reason,toLocal(r.created_at)])].map(row=>row.map(csvSafe).join(','));const blob=new Blob(['\uFEFF'+lines.join('\r\n')],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`문학_시리즈명_공모_응모내역_${dayKST(new Date())}.csv`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+    $('sendBtn').addEventListener('click',async()=>{const email=$('email').value.toLowerCase().trim();if(!allowed(email)){message('@mirae-n.com 회사 이메일을 입력해 주세요.',true);return;}lastEmail=email;$('sendBtn').disabled=true;message('인증 이메일을 보내는 중…');try{const {error}=await db.auth.signInWithOtp({email,options:{shouldCreateUser:true,emailRedirectTo:DASHBOARD_URL}});if(error)throw error;$('emailBox').classList.add('hidden');$('otpBox').classList.remove('hidden');message('이메일을 확인해 주세요. 인증 링크를 클릭하면 대시보드로 돌아옵니다. 6자리 코드가 도착한 경우 아래에 입력해도 됩니다.');}catch(e){message('메일 발송 실패: '+e.message,true);}finally{$('sendBtn').disabled=false;}});
+    $('verifyBtn').addEventListener('click',async()=>{const token=$('otp').value.trim();if(!/^\d{6}$/.test(token)){message('6자리 숫자 코드를 입력해 주세요.',true);return;}$('verifyBtn').disabled=true;try{const {data,error}=await db.auth.verifyOtp({email:lastEmail,token,type:'email'});if(error)throw error;if(!allowed(data?.user?.email)){await db.auth.signOut();throw new Error('회사 이메일만 이용할 수 있습니다.');}message('인증 완료!');showDashboard();}catch(e){message('인증 실패: '+e.message,true);}finally{$('verifyBtn').disabled=false;}});
+    $('backBtn').addEventListener('click',()=>{$('otpBox').classList.add('hidden');$('emailBox').classList.remove('hidden');message('');});$('logoutBtn').addEventListener('click',async()=>{await db.auth.signOut();showAuth();});
+    $('searchInput').addEventListener('input',()=>{page=0;rebuild();});$('sortSelect').addEventListener('change',()=>{page=0;rebuild();});$('refreshBtn').addEventListener('click',refresh);$('exportBtn').addEventListener('click',exportCsv);
+    $('prevBtn').addEventListener('click',()=>{if(page>0){page--;draw();}});$('nextBtn').addEventListener('click',()=>{if((page+1)*PAGE_SIZE<filtered.length){page++;draw();}});$('closeDialog').addEventListener('click',()=>$('reasonDialog').close());
+    if(!configured){$('setupNotice').classList.remove('hidden');$('emailBox').classList.add('hidden');}else{db.auth.getUser().then(async({data,error})=>{if(!error && data?.user && allowed(data.user.email))showDashboard();else{if(data?.user)await db.auth.signOut();showAuth();}});db.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT')showAuth();});}
+  </script>
+</body>
+</html>
