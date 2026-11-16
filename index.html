@@ -21,14 +21,13 @@
 </head>
 <body>
   <div id="authView" class="auth-wrap"><section class="auth-card">
-    <div class="eyebrow">MIRAE-N · TEAM DASHBOARD</div><h1>문학 시리즈 이름 공모</h1><p>팀원 공유용 응모 현황입니다.<br><strong>@mirae-n.com</strong> 회사 이메일 인증 후 조회할 수 있습니다.</p>
-    <div id="setupNotice" class="setup hidden">연결 설정이 아직 비어 있어요. HTML 상단의 SUPABASE_URL과 SUPABASE_PUBLISHABLE_KEY를 입력한 뒤 배포해 주세요. 자세한 방법은 함께 제공된 안내문을 확인해 주세요.</div>
-    <div id="emailBox"><label for="email">회사 이메일</label><input type="email" id="email" placeholder="name@mirae-n.com" autocomplete="email"><button id="sendBtn" class="primary">인증 메일 받기</button></div>
-    <div id="otpBox" class="hidden"><p>인증 메일의 링크를 클릭하거나 6자리 코드가 있다면 입력해 주세요.</p><label for="otp">이메일로 받은 6자리 인증 코드</label><input id="otp" type="text" inputmode="numeric" maxlength="6" placeholder="000000" autocomplete="one-time-code"><button id="verifyBtn" class="primary">인증하고 대시보드 보기</button><button id="backBtn" class="back">이메일 다시 입력하기</button></div>
+    <div class="eyebrow">MIRAE-N · TEAM DASHBOARD</div><h1>문학 시리즈 이름 공모</h1><p>팀원 공유용 응모 현황입니다.<br>공유받은 비밀번호를 입력해 주세요.</p>
+    <div id="setupNotice" class="setup hidden">Edge Function 연결 정보가 비어 있습니다. 관리자에게 문의해 주세요.</div>
+    <form id="passwordForm"><label for="password">공통 비밀번호</label><input type="password" id="password" placeholder="비밀번호 입력" autocomplete="current-password" required maxlength="256"><button id="loginBtn" type="submit" class="primary">대시보드 입장</button></form>
     <div id="authMessage" class="message" role="status"></div>
   </section></div>
   <main id="dashboard" class="shell hidden">
-    <header class="top"><div><div class="eyebrow">MIRAE-N · LITERATURE PROJECT</div><h1>교과서 문학 시리즈 이름 공모</h1><p class="sub">회사 이메일 인증 후 조회 · 30초마다 자동 갱신 · 조회 전용</p></div><button id="logoutBtn" class="logout">로그아웃</button></header>
+    <header class="top"><div><div class="eyebrow">MIRAE-N · LITERATURE PROJECT</div><h1>교과서 문학 시리즈 이름 공모</h1><p class="sub">팀원 공통 비밀번호 · 30초마다 자동 갱신 · 조회 전용</p></div><button id="logoutBtn" class="logout">로그아웃</button></header>
     <nav class="tabs" aria-label="조회 항목"><button id="namingTab" class="tab" aria-selected="true">이름 공모</button><button id="worldcupTab" class="tab" aria-selected="false">월드컵 순위</button></nav>
     <div id="namingSection">
     <div class="grid"><article class="tile"><div class="tile-label">전체 응모 건수</div><div id="totalCount" class="tile-number">—</div><small>중복 응모 포함</small></article><article class="tile"><div class="tile-label">응모자 수</div><div id="personCount" class="tile-number">—</div><small>이름·소속 조합 기준</small></article><article class="tile"><div class="tile-label">오늘 접수</div><div id="todayCount" class="tile-number">—</div><small>한국 시간 기준</small></article></div>
@@ -46,33 +45,37 @@
   </main>
   <dialog id="reasonDialog"><div class="dialog-body"><h3 id="dialogTitle"></h3><div id="dialogMeta" class="meta"></div><p id="dialogReason"></p><div class="dialog-actions"><button id="closeDialog" class="secondary">닫기</button></div></div></dialog>
   <script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-    // 아래 두 값만 본인 Supabase 프로젝트에서 복사해서 입력하세요.
-    // SERVICE_ROLE/SECRET 키는 절대로 이 파일에 넣지 마세요.
-    const SUPABASE_URL = 'https://rtkzwcjrudwzbwoxqyrv.supabase.co';
-    const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_vsCjVKXhwS3G8_gW5onWig_tie07cat';
-    const COMPANY_DOMAIN = '@mirae-n.com';
+    const FUNCTION_URL = 'https://rtkzwcjrudwzbwoxqyrv.supabase.co/functions/v1/team-dashboard';
+    const PUBLISHABLE_KEY = 'sb_publishable_vsCjVKXhwS3G8_gW5onWig_tie07cat';
     const PAGE_SIZE = 20;
-    const DASHBOARD_URL = 'https://jjory-web.github.io/literature-dashboard/';
     const $ = id => document.getElementById(id);
-    const configured = SUPABASE_URL.startsWith('https://') && !SUPABASE_URL.includes('PASTE_') && !SUPABASE_PUBLISHABLE_KEY.includes('PASTE_');
-    const db = configured ? createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY) : null;
-    let allRows=[], filtered=[], page=0, channel=null, poller=null, refreshPromise=null, lastEmail='';
-    let rankingRows=[], rankingSize='all';
-    function allowed(email){return typeof email==='string' && email.toLowerCase().trim().endsWith(COMPANY_DOMAIN) && email.toLowerCase().trim().split('@').length===2 && email.split('@')[0].length>0;}
+    const configured = FUNCTION_URL.startsWith('https://') && !!PUBLISHABLE_KEY;
+    let token = sessionStorage.getItem('literature_team_token') || '';
+    let allRows=[], filtered=[], page=0, poller=null, refreshPromise=null, rankingRows=[], rankingSize='all';
     function message(msg, isError=false){$('authMessage').textContent=msg;$('authMessage').className='message'+(isError?' error':'');}
     function toLocal(value){if(!value)return '—';const d=new Date(value);return Number.isNaN(d.getTime())?'—':new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false}).format(d);}
     function dayKST(value){const d=new Date(value);return Number.isNaN(d.getTime())?'':new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).format(d);}
     function cmpTime(a,b){return new Date(a.created_at||0)-new Date(b.created_at||0);}
     function showAuth(){ $('authView').classList.remove('hidden');$('dashboard').classList.add('hidden');stopWatching(); }
     function showDashboard(){ $('authView').classList.add('hidden');$('dashboard').classList.remove('hidden');startWatching(); }
+    function logout(msg='') {token='';sessionStorage.removeItem('literature_team_token');allRows=[];rankingRows=[];showAuth();message(msg,!!msg);}
     function setStatus(label, live=false){$('statusText').textContent=label;$('liveDot').classList.toggle('on',live);}
-    async function fetchAll(){const chunk=500, result=[];let offset=0;
-      while(true){const {data,error}=await db.rpc('dashboard_naming_entries').order('id',{ascending:true}).range(offset,offset+chunk-1);
-        if(error)throw error;result.push(...(data||[]));if(!data||data.length<chunk)break;offset+=chunk;if(offset>=100000)throw new Error('응모 데이터가 10만 건을 넘어 관리자 확인이 필요합니다.');}
-      return result;
+    async function api(action, extra={}) {
+      const res=await fetch(FUNCTION_URL,{
+        method:'POST',
+        headers:{'Content-Type':'application/json','apikey':PUBLISHABLE_KEY},
+        body:JSON.stringify({action, ...(action==='login'?extra:{token,...extra})}),
+        cache:'no-store'
+      });
+      let data={};try{data=await res.json();}catch{}
+      if(!res.ok){
+        if(res.status===401 && action!=='login') logout('로그인 시간이 만료됐어요. 다시 입장해 주세요.');
+        throw new Error(data.error||`요청 실패 (HTTP ${res.status})`);
+      }
+      return data;
     }
-    async function refresh(){if(refreshPromise)return refreshPromise;refreshPromise=(async()=>{try{setStatus('최신 응모 내역을 불러오는 중…');const data=await fetchAll();allRows=data;rebuild();setStatus(`마지막 갱신: ${new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).format(new Date())} · 자동 갱신 중`,true);}catch(e){allRows=[];filtered=[];page=0;rebuild();setStatus('조회 실패: '+e.message);console.error(e);}})();try{await refreshPromise;}finally{refreshPromise=null;}}
+    async function fetchAll(){const response=await api('naming');if(!Array.isArray(response.data))throw new Error('응모 데이터를 읽을 수 없습니다.');return response.data;}
+    async function refresh(){if(refreshPromise)return refreshPromise;refreshPromise=(async()=>{try{setStatus('최신 응모 내역을 불러오는 중…');const data=await fetchAll();allRows=data;rebuild();setStatus(`마지막 갱신: ${new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).format(new Date())} · 자동 갱신 중`,true);}catch(e){if(!token)return;setStatus('조회 실패: '+e.message);console.error(e);}})();try{await refreshPromise;}finally{refreshPromise=null;}}
     function rebuild(){const needle=$('searchInput').value.trim().toLocaleLowerCase('ko');filtered=allRows.filter(r=>[r.name,r.department,r.naming,r.reason].some(v=>String(v??'').toLocaleLowerCase('ko').includes(needle)));
       const sort=$('sortSelect').value;filtered.sort(sort==='old'?(a,b)=>cmpTime(a,b)||Number(a.id)-Number(b.id):sort==='name'?(a,b)=>String(a.name||'').localeCompare(String(b.name||''),'ko')||cmpTime(b,a):(a,b)=>cmpTime(b,a)||Number(b.id)-Number(a.id));
       const today=dayKST(new Date());$('totalCount').textContent=allRows.length.toLocaleString('ko-KR')+'건';$('personCount').textContent=new Set(allRows.map(r=>JSON.stringify([r.name||'',r.department||'']))).size.toLocaleString('ko-KR')+'명';$('todayCount').textContent=allRows.filter(r=>dayKST(r.created_at)===today).length.toLocaleString('ko-KR')+'건';
@@ -83,7 +86,7 @@
       for(const r of rows){const tr=document.createElement('tr');cell(tr,r.id);cell(tr,r.name);cell(tr,r.department);cell(tr,r.naming);
         const td=document.createElement('td');const btn=document.createElement('button');btn.className='reason ellipsis';btn.textContent=r.reason||'—';btn.title='제안 이유 전체 보기';btn.addEventListener('click',()=>{$('dialogTitle').textContent=r.naming||'제안 이유';$('dialogMeta').textContent=`${r.name||'—'} · ${r.department||'—'} · ${toLocal(r.created_at)}`;$('dialogReason').textContent=r.reason||'제안 이유 없음';$('reasonDialog').showModal();});td.append(btn);tr.append(td);cell(tr,toLocal(r.created_at));body.append(tr);}
       $('pageInfo').textContent=`검색 결과 ${filtered.length.toLocaleString('ko-KR')}건 · ${filtered.length?page+1:0} / ${Math.ceil(filtered.length/PAGE_SIZE)}페이지`;$('prevBtn').disabled=page===0;$('nextBtn').disabled=(page+1)*PAGE_SIZE>=filtered.length;}
-    function stopWatching(){if(channel){db?.removeChannel(channel);channel=null;}if(poller){clearInterval(poller);poller=null;}}
+    function stopWatching(){if(poller){clearInterval(poller);poller=null;}}
     function startWatching(){stopWatching();refresh();refreshRankings();/* 테이블 API 비노출 상태이므로 Realtime 구독 대신 30초 주기 조회 */poller=setInterval(()=>{if(!document.hidden){refresh();refreshRankings();}},30000);}
     function switchTab(which){
       const isNaming=which==='naming';$('namingSection').classList.toggle('hidden',!isNaming);$('worldcupSection').classList.toggle('hidden',isNaming);
@@ -91,8 +94,8 @@
     }
     async function refreshRankings(){
       try{
-        const {data,error}=await db.rpc('dashboard_worldcup_rankings');if(error)throw error;
-        rankingRows=Array.isArray(data)?data:[];renderRankings();
+        const response=await api('worldcup');
+        rankingRows=Array.isArray(response.data)?response.data:[];renderRankings();
         $('rankingStatus').textContent=`총 ${rankingRows.reduce((sum,r)=>sum+Number(r.wins||0),0).toLocaleString('ko-KR')}건의 최종 우승 기록 · 최신 집계`;
       }catch(e){rankingRows=[];renderRankings();$('rankingStatus').textContent='순위 조회 실패: '+e.message;console.error(e);}
     }
@@ -114,12 +117,28 @@
     document.querySelectorAll('[data-size]').forEach(b=>b.addEventListener('click',()=>{rankingSize=b.dataset.size;document.querySelectorAll('[data-size]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));renderRankings();}));
     function csvSafe(v){let str=String(v??'');if(/^[\s]*[=+\-@\t\r]/.test(str))str="'"+str;return '"'+str.replaceAll('"','""')+'"';}
     function exportCsv(){const headers=['응모 번호','응모자 이름','소속 팀','제안한 시리즈명','제안 이유','접수 시각(한국 시간)'];const lines=[headers,...filtered.map(r=>[r.id,r.name,r.department,r.naming,r.reason,toLocal(r.created_at)])].map(row=>row.map(csvSafe).join(','));const blob=new Blob(['\uFEFF'+lines.join('\r\n')],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`문학_시리즈명_공모_응모내역_${dayKST(new Date())}.csv`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
-    $('sendBtn').addEventListener('click',async()=>{const email=$('email').value.toLowerCase().trim();if(!allowed(email)){message('@mirae-n.com 회사 이메일을 입력해 주세요.',true);return;}lastEmail=email;$('sendBtn').disabled=true;message('인증 이메일을 보내는 중…');try{const {error}=await db.auth.signInWithOtp({email,options:{shouldCreateUser:true,emailRedirectTo:DASHBOARD_URL}});if(error)throw error;$('emailBox').classList.add('hidden');$('otpBox').classList.remove('hidden');message('이메일을 확인해 주세요. 인증 링크를 클릭하면 대시보드로 돌아옵니다. 6자리 코드가 도착한 경우 아래에 입력해도 됩니다.');}catch(e){message('메일 발송 실패: '+e.message,true);}finally{$('sendBtn').disabled=false;}});
-    $('verifyBtn').addEventListener('click',async()=>{const token=$('otp').value.trim();if(!/^\d{6}$/.test(token)){message('6자리 숫자 코드를 입력해 주세요.',true);return;}$('verifyBtn').disabled=true;try{const {data,error}=await db.auth.verifyOtp({email:lastEmail,token,type:'email'});if(error)throw error;if(!allowed(data?.user?.email)){await db.auth.signOut();throw new Error('회사 이메일만 이용할 수 있습니다.');}message('인증 완료!');showDashboard();}catch(e){message('인증 실패: '+e.message,true);}finally{$('verifyBtn').disabled=false;}});
-    $('backBtn').addEventListener('click',()=>{$('otpBox').classList.add('hidden');$('emailBox').classList.remove('hidden');message('');});$('logoutBtn').addEventListener('click',async()=>{await db.auth.signOut();showAuth();});
+    $('passwordForm').addEventListener('submit',async(e)=>{
+      e.preventDefault();const password=$('password').value;
+      if(!password){message('비밀번호를 입력해 주세요.',true);return;}
+      $('loginBtn').disabled=true;message('비밀번호 확인 중…');
+      try{
+        const data=await api('login',{password});
+        if(typeof data.token!=='string')throw new Error('로그인 토큰을 받지 못했습니다.');
+        token=data.token;sessionStorage.setItem('literature_team_token',token);
+        $('password').value='';message('');showDashboard();
+      }catch(err){message('로그인 실패: '+err.message,true);}
+      finally{$('loginBtn').disabled=false;}
+    });
+    $('logoutBtn').addEventListener('click',()=>logout());
     $('searchInput').addEventListener('input',()=>{page=0;rebuild();});$('sortSelect').addEventListener('change',()=>{page=0;rebuild();});$('refreshBtn').addEventListener('click',refresh);$('exportBtn').addEventListener('click',exportCsv);
     $('prevBtn').addEventListener('click',()=>{if(page>0){page--;draw();}});$('nextBtn').addEventListener('click',()=>{if((page+1)*PAGE_SIZE<filtered.length){page++;draw();}});$('closeDialog').addEventListener('click',()=>$('reasonDialog').close());
-    if(!configured){$('setupNotice').classList.remove('hidden');$('emailBox').classList.add('hidden');}else{db.auth.getUser().then(async({data,error})=>{if(!error && data?.user && allowed(data.user.email))showDashboard();else{if(data?.user)await db.auth.signOut();showAuth();}});db.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT')showAuth();});}
+    if(!configured){$('setupNotice').classList.remove('hidden');$('passwordForm').classList.add('hidden');}
+    else if(token){api('naming').then(result=>{
+      if(!token)return;
+      allRows=Array.isArray(result.data)?result.data:[];
+      showDashboard();
+    }).catch(()=>{if(token)logout('저장된 로그인 상태를 확인할 수 없습니다. 다시 로그인해 주세요.');});}
+    else showAuth();
   </script>
 </body>
 </html>
