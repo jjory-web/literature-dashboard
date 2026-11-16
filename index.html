@@ -14,6 +14,9 @@
     .auth-wrap{min-height:90vh;display:grid;place-items:center;padding:20px}.auth-card{padding:35px;width:min(100%,440px)}.auth-card h1{font-size:25px;margin:8px 0}.auth-card p{font-size:14px;color:#736d81;line-height:1.7}.auth-card label{display:block;font-size:13px;font-weight:700;margin:23px 0 8px}.auth-card button{width:100%;margin-top:13px}.message{font-size:13px;margin-top:13px;color:#7263a1;line-height:1.6}.error{color:#ae4358}.setup{background:#fff8e9;border:1px solid #eadab6;border-radius:10px;padding:12px;font-size:13px;line-height:1.7;color:#8c672a}.back{background:none;border:none;color:#7961b1;padding:0;margin-top:18px}
     dialog{border:0;border-radius:18px;padding:0;max-width:620px;width:calc(100% - 30px);box-shadow:0 20px 60px #2224}dialog::backdrop{background:#2228}.dialog-body{padding:27px}.dialog-body h3{margin:0 0 10px}.dialog-body p{line-height:1.8;white-space:pre-wrap;overflow-wrap:anywhere}.dialog-body .meta{color:#797281;font-size:13px}.dialog-actions{text-align:right}
     @media(max-width:690px){.shell{padding:24px 14px}.top h1{font-size:23px}.grid{gap:8px}.tile{padding:15px 12px}.tile-number{font-size:24px}.tile-label{font-size:11px}.panel{padding:17px 13px}.top{align-items:center}.logout{padding:9px;font-size:12px}}
+  
+    .tabs{display:flex;gap:8px;margin:22px 0 6px}.tab{border:1px solid #ded7ed;background:#fff;color:#645b72;border-radius:11px;padding:11px 20px;font-weight:750}.tab[aria-selected="true"]{background:#7962b2;color:#fff;border-color:#7962b2}
+    .rank-list{display:grid;gap:9px;margin-top:18px}.rank-item{display:grid;grid-template-columns:40px minmax(0,1fr) 85px;align-items:center;gap:12px;border:1px solid #efecf4;border-radius:12px;padding:12px 15px}.rank-number{font-weight:800;color:#7962b2}.rank-name{font-weight:700;min-width:0}.rank-votes{text-align:right;color:#574675;font-weight:750}.rank-track{height:7px;background:#f1edf7;border-radius:8px;margin-top:8px;overflow:hidden}.rank-track>i{height:100%;background:#8871c4;display:block;border-radius:8px}.rank-caption{color:#787181;font-size:13px;line-height:1.7}.rank-filters{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.rank-filters button{border:1px solid #dfd8ee;padding:8px 15px;background:white;border-radius:9px;color:#675c77}.rank-filters button[aria-pressed="true"]{background:#f0eaf9;border-color:#9179c6;color:#563f84;font-weight:750}
   </style>
 </head>
 <body>
@@ -26,13 +29,20 @@
   </section></div>
   <main id="dashboard" class="shell hidden">
     <header class="top"><div><div class="eyebrow">MIRAE-N · LITERATURE PROJECT</div><h1>교과서 문학 시리즈 이름 공모</h1><p class="sub">회사 이메일 인증 후 조회 · 30초마다 자동 갱신 · 조회 전용</p></div><button id="logoutBtn" class="logout">로그아웃</button></header>
+    <nav class="tabs" aria-label="조회 항목"><button id="namingTab" class="tab" aria-selected="true">이름 공모</button><button id="worldcupTab" class="tab" aria-selected="false">월드컵 순위</button></nav>
+    <div id="namingSection">
     <div class="grid"><article class="tile"><div class="tile-label">전체 응모 건수</div><div id="totalCount" class="tile-number">—</div><small>중복 응모 포함</small></article><article class="tile"><div class="tile-label">응모자 수</div><div id="personCount" class="tile-number">—</div><small>이름·소속 조합 기준</small></article><article class="tile"><div class="tile-label">오늘 접수</div><div id="todayCount" class="tile-number">—</div><small>한국 시간 기준</small></article></div>
     <section class="panel"><div class="toolbar"><div><h2>전체 응모 목록</h2><p>같은 사람이 여러 번 제출해도 각각 표시합니다.</p></div><button id="exportBtn" class="secondary">↓ CSV 다운로드</button></div>
       <div class="controls"><div class="search"><input id="searchInput" aria-label="응모 내역 검색" placeholder="응모자 · 소속 · 제안명 · 제안 이유 검색"></div><select id="sortSelect" aria-label="정렬"><option value="new">최신 응모순</option><option value="old">오래된 응모순</option><option value="name">응모자 이름순</option></select><button id="refreshBtn" class="secondary">↻ 새로고침</button></div>
       <div class="status"><span id="liveDot" class="dot"></span><span id="statusText" role="status">데이터를 불러오는 중입니다.</span></div>
       <div class="scroll"><table><thead><tr><th>No.</th><th>응모자</th><th>소속 팀</th><th>제안한 시리즈명</th><th>제안 이유 (클릭하면 전문 보기)</th><th>접수 시각</th></tr></thead><tbody id="rows"></tbody></table></div>
       <div class="pager"><span id="pageInfo" class="muted"></span><div><button id="prevBtn">이전</button> <button id="nextBtn">다음</button></div></div>
-    </section><p class="footer">원본 응모 데이터는 변경되지 않습니다. 다운로드 파일에는 현재 검색 결과의 모든 행이 포함됩니다.</p>
+    </section></div>
+    <section id="worldcupSection" class="panel hidden"><div class="toolbar"><div><h2>문학 월드컵 최종 우승 순위</h2><p>한 번의 월드컵을 완료할 때 기록된 최종 우승작을 1회로 집계합니다.</p></div><button id="rankingRefresh" class="secondary">↻ 새로고침</button></div>
+      <div class="rank-filters" aria-label="월드컵 모드"><button data-size="all" aria-pressed="true">전체</button><button data-size="16" aria-pressed="false">16강</button><button data-size="32" aria-pressed="false">32강</button></div>
+      <p id="rankingStatus" class="rank-caption" role="status">순위 불러오는 중…</p><div id="rankingList" class="rank-list"></div>
+      <p class="rank-caption">동률은 작품 번호순으로 표시해요. 첫 참여 여부와 관계없이 완료된 모든 우승 기록을 합산합니다. 30초마다 자동 갱신됩니다.</p></section>
+    <p class="footer">원본 응모 데이터는 변경되지 않습니다. 다운로드 파일에는 현재 검색 결과의 모든 행이 포함됩니다.</p>
   </main>
   <dialog id="reasonDialog"><div class="dialog-body"><h3 id="dialogTitle"></h3><div id="dialogMeta" class="meta"></div><p id="dialogReason"></p><div class="dialog-actions"><button id="closeDialog" class="secondary">닫기</button></div></div></dialog>
   <script type="module">
@@ -48,6 +58,7 @@
     const configured = SUPABASE_URL.startsWith('https://') && !SUPABASE_URL.includes('PASTE_') && !SUPABASE_PUBLISHABLE_KEY.includes('PASTE_');
     const db = configured ? createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY) : null;
     let allRows=[], filtered=[], page=0, channel=null, poller=null, refreshPromise=null, lastEmail='';
+    let rankingRows=[], rankingSize='all';
     function allowed(email){return typeof email==='string' && email.toLowerCase().trim().endsWith(COMPANY_DOMAIN) && email.toLowerCase().trim().split('@').length===2 && email.split('@')[0].length>0;}
     function message(msg, isError=false){$('authMessage').textContent=msg;$('authMessage').className='message'+(isError?' error':'');}
     function toLocal(value){if(!value)return '—';const d=new Date(value);return Number.isNaN(d.getTime())?'—':new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false}).format(d);}
@@ -73,7 +84,34 @@
         const td=document.createElement('td');const btn=document.createElement('button');btn.className='reason ellipsis';btn.textContent=r.reason||'—';btn.title='제안 이유 전체 보기';btn.addEventListener('click',()=>{$('dialogTitle').textContent=r.naming||'제안 이유';$('dialogMeta').textContent=`${r.name||'—'} · ${r.department||'—'} · ${toLocal(r.created_at)}`;$('dialogReason').textContent=r.reason||'제안 이유 없음';$('reasonDialog').showModal();});td.append(btn);tr.append(td);cell(tr,toLocal(r.created_at));body.append(tr);}
       $('pageInfo').textContent=`검색 결과 ${filtered.length.toLocaleString('ko-KR')}건 · ${filtered.length?page+1:0} / ${Math.ceil(filtered.length/PAGE_SIZE)}페이지`;$('prevBtn').disabled=page===0;$('nextBtn').disabled=(page+1)*PAGE_SIZE>=filtered.length;}
     function stopWatching(){if(channel){db?.removeChannel(channel);channel=null;}if(poller){clearInterval(poller);poller=null;}}
-    function startWatching(){stopWatching();refresh();/* 테이블 API 비노출 상태이므로 Realtime 구독 대신 30초 주기 조회 */poller=setInterval(()=>{if(!document.hidden)refresh();},30000);}
+    function startWatching(){stopWatching();refresh();refreshRankings();/* 테이블 API 비노출 상태이므로 Realtime 구독 대신 30초 주기 조회 */poller=setInterval(()=>{if(!document.hidden){refresh();refreshRankings();}},30000);}
+    function switchTab(which){
+      const isNaming=which==='naming';$('namingSection').classList.toggle('hidden',!isNaming);$('worldcupSection').classList.toggle('hidden',isNaming);
+      $('namingTab').setAttribute('aria-selected',String(isNaming));$('worldcupTab').setAttribute('aria-selected',String(!isNaming));
+    }
+    async function refreshRankings(){
+      try{
+        const {data,error}=await db.rpc('dashboard_worldcup_rankings');if(error)throw error;
+        rankingRows=Array.isArray(data)?data:[];renderRankings();
+        $('rankingStatus').textContent=`총 ${rankingRows.reduce((sum,r)=>sum+Number(r.wins||0),0).toLocaleString('ko-KR')}건의 최종 우승 기록 · 최신 집계`;
+      }catch(e){rankingRows=[];renderRankings();$('rankingStatus').textContent='순위 조회 실패: '+e.message;console.error(e);}
+    }
+    function renderRankings(){
+      const rows=rankingRows.filter(r=>rankingSize==='all'||Number(r.bracket_size)===Number(rankingSize));
+      const totals=new Map();for(const r of rows){const id=Number(r.work_id);const old=totals.get(id)||{id,title:r.work_title||'제목 없음',votes:0};old.votes+=Number(r.wins||0);totals.set(id,old);}
+      const sorted=[...totals.values()].sort((a,b)=>b.votes-a.votes||a.id-b.id);const maximum=sorted[0]?.votes||1;
+      const root=$('rankingList');root.replaceChildren();if(!sorted.length){const x=document.createElement('p');x.className='rank-caption';x.textContent='아직 기록된 우승작이 없어요.';root.append(x);return;}
+      sorted.forEach((r,i)=>{const el=document.createElement('div');el.className='rank-item';
+        const num=document.createElement('span');num.className='rank-number';num.textContent=`${i+1}위`;
+        const box=document.createElement('div');box.className='rank-name';box.textContent=r.title;
+        const track=document.createElement('div');track.className='rank-track';const fill=document.createElement('i');fill.style.width=`${r.votes/maximum*100}%`;track.append(fill);box.append(track);
+        const wins=document.createElement('span');wins.className='rank-votes';wins.textContent=`${r.votes.toLocaleString('ko-KR')}회`;
+        el.append(num,box,wins);root.append(el);});
+    }
+    $('namingTab').addEventListener('click',()=>switchTab('naming'));
+    $('worldcupTab').addEventListener('click',()=>switchTab('worldcup'));
+    $('rankingRefresh').addEventListener('click',refreshRankings);
+    document.querySelectorAll('[data-size]').forEach(b=>b.addEventListener('click',()=>{rankingSize=b.dataset.size;document.querySelectorAll('[data-size]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));renderRankings();}));
     function csvSafe(v){let str=String(v??'');if(/^[\s]*[=+\-@\t\r]/.test(str))str="'"+str;return '"'+str.replaceAll('"','""')+'"';}
     function exportCsv(){const headers=['응모 번호','응모자 이름','소속 팀','제안한 시리즈명','제안 이유','접수 시각(한국 시간)'];const lines=[headers,...filtered.map(r=>[r.id,r.name,r.department,r.naming,r.reason,toLocal(r.created_at)])].map(row=>row.map(csvSafe).join(','));const blob=new Blob(['\uFEFF'+lines.join('\r\n')],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`문학_시리즈명_공모_응모내역_${dayKST(new Date())}.csv`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
     $('sendBtn').addEventListener('click',async()=>{const email=$('email').value.toLowerCase().trim();if(!allowed(email)){message('@mirae-n.com 회사 이메일을 입력해 주세요.',true);return;}lastEmail=email;$('sendBtn').disabled=true;message('인증 이메일을 보내는 중…');try{const {error}=await db.auth.signInWithOtp({email,options:{shouldCreateUser:true,emailRedirectTo:DASHBOARD_URL}});if(error)throw error;$('emailBox').classList.add('hidden');$('otpBox').classList.remove('hidden');message('이메일을 확인해 주세요. 인증 링크를 클릭하면 대시보드로 돌아옵니다. 6자리 코드가 도착한 경우 아래에 입력해도 됩니다.');}catch(e){message('메일 발송 실패: '+e.message,true);}finally{$('sendBtn').disabled=false;}});
